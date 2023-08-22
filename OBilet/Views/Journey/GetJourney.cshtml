@@ -1,0 +1,20 @@
+﻿@model List<OBilet.API.Model.Response.JourneyRootResponse>
+<div style="background-color:blue;height:100px">
+    <button type="button" onclick="history.back()">Geri Git</button>
+    <div style=" color: white; text-align: center;"> @Model[0].OriginLocation - @Model[0].DestinationLocation</div>
+    <div style=" color: white; text-align: center;"> @Model[0].Journey.Departure.ToString("dd-MM-yyyy")</div>
+</div>
+
+@foreach (var item in Model)
+{
+    <div style="padding: 10px;">
+        <div style="padding: 10px; border: lightgrey; border-style: groove; border-radius:10px">
+            <div style="color: blue; font-size: 12px;">Kalkış &emsp;&emsp; Varış </div>
+            <div style=" display: table; width: 100%; table-layout: fixed;">
+                <div style="color: blue; display: table-cell;">@item.Journey.Departure.ToString("HH:mm") -> @item.Journey.Arrival.ToString("HH:mm")</div>
+                <div style="border: lightgrey; border-style: groove; border-radius: 10px;background-color:red; color: white; text-align: center; display: table-cell; ">@item.Journey.InternetPrice.ToString("C", System.Globalization.CultureInfo.CurrentCulture)</div>
+            </div>
+            <div style="color: darkgrey; font-size: 12px;">@item.Journey.Origin - @item.Journey.Destination</div>
+        </div>
+    </div>
+}

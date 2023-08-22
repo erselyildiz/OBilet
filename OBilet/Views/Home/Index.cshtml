@@ -1,0 +1,124 @@
+﻿
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+
+<div style="background-color:blue;height:50px"></div>
+<form style="background-color:#dfe4e9; padding-top: 15px">
+    <div style="background-color:white; padding-left:15px">
+        Nereden
+        <br />
+        <div class="input-group">
+            <div class="form-outline">
+                <input type="search" id="from-destination" class="form-control" placeholder="İl veya ilçe adı yazın" data-value="" />
+            </div>
+            <button onclick="fromDestinationSearch()" type="button">Ara</button>
+        </div>
+        <div id="from-results">
+        </div>
+    </div>
+    <div style="float: right; padding-right:40px">
+        <button type="button" onclick="swapFromTo()">Değiştir</button>
+    </div>
+    <div style="background-color: white;  padding-left: 15px">
+        Nereye
+        <br />
+        <div class="input-group">
+            <div class="form-outline">
+                <input type="search" id="to-destination" class="form-control" placeholder="İl veya ilçe adı yazın" data-value="" />
+            </div>
+            <button onclick="toDestinationSearch()" type="button">Ara</button>
+        </div>
+        <div id="to-results">
+        </div>
+    </div>
+    <div style="background-color: white;  padding-left: 15px">
+        Tarih
+        <br />
+        <div class="input-group">
+            <div class="form-outline">
+                <input type="date" id="destination-date" class="form-control"/>
+            </div>
+            <button type="button" onclick="setDay(0)">Bugün</button>
+            <button type="button" onclick="setDay(1)">Yarın</button>
+        </div>
+    </div>
+    <div style="background-color: white; padding-left: 15px; padding-top: 15px">
+        <button type="button" onclick="getJourney()">Biletleri Listele</button>
+    </div>
+</form>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        document.getElementById('destination-date').valueAsDate = new Date();
+    });
+
+    function setDay(i) {
+        var date = new Date();
+
+        date.setDate(date.getDate() + i);
+        document.getElementById('destination-date').valueAsDate = date;
+    }
+
+    function fromDestinationSearch() {
+        $.ajax({
+            url: "/BusLocation/GetBusLocation?data=" + document.getElementById('from-destination').value,
+            success: function (result) {
+                var fromDestinationHtml = '<ul>';
+                for (let i = 0; i < result.length; i++) {
+                    fromDestinationHtml += '<li class="item" data-value="' + result[i].Id + '" onclick="setFromDestination(' + result[i].Id + ',\'' + result[i].Name +'\')">';
+                    fromDestinationHtml += '<span class="location">' + result[i].Name +'</span>';
+                    fromDestinationHtml += '</li>';
+                }
+                fromDestinationHtml += '<ul>';
+                document.getElementById('from-results').innerHTML = fromDestinationHtml;
+            }
+        });
+    }
+
+    function toDestinationSearch() {
+        $.ajax({
+            url: "/BusLocation/GetBusLocation?data=" + document.getElementById('to-destination').value,
+            success: function (result) {
+                var toDestinationHtml = '<ul>';
+                for (let i = 0; i < result.length; i++) {
+                    toDestinationHtml += '<li class="item" data-value="' + result[i].Id + '" onclick="setToDestination(' + result[i].Id + ',\'' + result[i].Name + '\')">';
+                    toDestinationHtml += '<span class="location">' + result[i].Name + '</span>';
+                    toDestinationHtml += '</li>';
+                }
+                toDestinationHtml += '<ul>';
+                document.getElementById('to-results').innerHTML = toDestinationHtml;
+            }
+        });
+    }
+
+    function setFromDestination(id, name) {
+        document.getElementById('from-destination').value = name;
+        document.getElementById("from-destination").setAttribute('data-value', id);
+        document.getElementById('from-results').innerHTML = '';
+    }
+
+    function setToDestination(id, name) {
+        document.getElementById('to-destination').value = name;
+        document.getElementById("to-destination").setAttribute('data-value', id);
+        document.getElementById('to-results').innerHTML = '';
+    }
+
+    function swapFromTo() {
+        var fromValue = document.getElementById('from-destination').value;
+        var fromDataValue = document.getElementById("from-destination").getAttribute('data-value');
+        var toValue = document.getElementById('to-destination').value;
+        var toDataValue = document.getElementById("to-destination").getAttribute('data-value');
+
+        document.getElementById('from-destination').value = toValue;
+        document.getElementById("from-destination").setAttribute('data-value', toDataValue);
+
+        document.getElementById('to-destination').value = fromValue;
+        document.getElementById("to-destination").setAttribute('data-value', fromDataValue);
+    }
+
+    function getJourney() {
+        location.href = '/Journey/GetJourney?originId=' + document.getElementById("from-destination").getAttribute('data-value')
+            + '&destinationId=' + document.getElementById("to-destination").getAttribute('data-value')
+            + '&date=' + document.getElementById('destination-date').value;
+    }
+</script>
